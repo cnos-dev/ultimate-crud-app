@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: ultimate-crud-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ultimate_crud_blog
+      MYSQL_USER: bloguser
+      MYSQL_PASSWORD: blogpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../data/database-mysql.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    networks:
+      - mysql-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # phpMyAdmin - MySQL Management
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2
+    container_name: ultimate-crud-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: bloguser
+      PMA_PASSWORD: blogpassword
+    ports:
+      - "8081:80"
+    networks:
+      - mysql-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  mysql-network:
+    driver: bridge

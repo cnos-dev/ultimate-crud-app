@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: ultimate-crud-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ultimate_crud_blog
+      POSTGRES_USER: bloguser
+      POSTGRES_PASSWORD: blogpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../data/database-postgresql.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    networks:
+      - postgres-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bloguser -d ultimate_crud_blog"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # pgAdmin - PostgreSQL Management
+  pgadmin:
+    image: dpage/pgadmin4:7
+    container_name: ultimate-crud-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "8082:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - postgres-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  postgres-network:
+    driver: bridge

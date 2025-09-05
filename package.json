@@ -1,0 +1,78 @@
+{
+  "name": "ultimate-crud-app",
+  "version": "1.0.0",
+  "description": "Comprehensive demonstration application for the ultimate-crud npm package",
+  "main": "index.js",
+  "bin": {
+    "ultimate-crud": "./bin/ultimate-crud"
+  },
+  "scripts": {
+    "setup": "node bin/ultimate-crud setup",
+    "install:all": "npm run install:mysql && npm run install:postgresql && npm run install:sqlite",
+    "install:mysql": "cd mysql && npm install",
+    "install:postgresql": "cd postgresql && npm install",
+    "install:sqlite": "cd sqlite && npm install",
+    "start:mysql": "cd mysql && npm start",
+    "start:postgresql": "cd postgresql && npm start",
+    "start:sqlite": "cd sqlite && npm start",
+    "dev:mysql": "cd mysql && npm run dev",
+    "dev:postgresql": "cd postgresql && npm run dev",
+    "dev:sqlite": "cd sqlite && npm run dev",
+    "test": "npm run test:mysql && npm run test:postgresql && npm run test:sqlite",
+    "test:mysql": "cd mysql && npm test",
+    "test:postgresql": "cd postgresql && npm test",
+    "test:sqlite": "cd sqlite && npm test",
+    "docker:up": "docker-compose -f config/database/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f config/database/docker-compose.yml down",
+    "docker:logs": "docker-compose -f config/database/docker-compose.yml logs -f",
+    "cleanup": "node scripts/cleanup.js",
+    "docs": "node scripts/generate-docs.js",
+    "lint": "eslint . --ext .js,.json --ignore-path .gitignore",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ultimate-crud/ultimate-crud-app.git"
+  },
+  "keywords": [
+    "ultimate-crud",
+    "crud",
+    "api",
+    "rest",
+    "graphql",
+    "mysql",
+    "postgresql",
+    "sqlite",
+    "database",
+    "demo",
+    "example",
+    "cli"
+  ],
+  "author": "Ultimate CRUD Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ultimate-crud/ultimate-crud-app/issues"
+  },
+  "homepage": "https://github.com/ultimate-crud/ultimate-crud-app#readme",
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "eslint-config-standard": "^17.1.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "inquirer": "^8.2.6",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "fs-extra": "^11.1.1",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
+  "workspaces": [
+    "mysql",
+    "postgresql", 
+    "sqlite"
+  ]
+}

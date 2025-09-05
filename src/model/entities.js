@@ -318,6 +318,106 @@ const entities = [
       200: 'Popular posts retrieved successfully',
       400: 'Invalid parameters provided'
     }
+  },
+
+  // ===========================================
+  // TEST TABLES (Custom Primary Key Testing)
+  // ===========================================
+  
+  {
+    name: 'products',
+    type: 'table',
+    route: '/api/products',
+    validation: {
+      uniqueFields: ['sku'],
+      conflictStatusCode: 409
+    },
+    // Primary key: product_id (auto-increment)
+    // Ultimate CRUD should auto-discover this
+    associations: [
+      {
+        type: 'hasMany',
+        target: 'order_items',
+        foreignKey: 'product_id',
+        as: 'order_items'
+      }
+    ],
+    responseMessages: {
+      200: 'Products retrieved successfully',
+      201: 'Product created successfully',
+      400: 'Invalid product data',
+      404: 'Product not found',
+      409: 'SKU already exists'
+    }
+  },
+
+  {
+    name: 'orders',
+    type: 'table',
+    route: '/api/orders',
+    // Primary key: order_uuid (VARCHAR, manual assignment)
+    // Ultimate CRUD should auto-discover this
+    associations: [
+      {
+        type: 'hasMany',
+        target: 'order_items',
+        foreignKey: 'order_uuid',
+        as: 'order_items'
+      }
+    ],
+    responseMessages: {
+      200: 'Orders retrieved successfully',
+      201: 'Order created successfully',
+      400: 'Invalid order data',
+      404: 'Order not found'
+    }
+  },
+
+  {
+    name: 'order_items',
+    type: 'table',
+    route: '/api/order-items',
+    // Compound primary key: (order_uuid, product_id)
+    // Ultimate CRUD should auto-discover this
+    associations: [
+      {
+        type: 'belongsTo',
+        target: 'orders',
+        foreignKey: 'order_uuid',
+        as: 'order'
+      },
+      {
+        type: 'belongsTo',
+        target: 'products',
+        foreignKey: 'product_id',
+        as: 'product'
+      }
+    ],
+    responseMessages: {
+      200: 'Order items retrieved successfully',
+      201: 'Order item created successfully',
+      400: 'Invalid order item data',
+      404: 'Order item not found'
+    }
+  },
+
+  {
+    name: 'inventory',
+    type: 'table',
+    route: '/api/inventory',
+    validation: {
+      uniqueFields: ['location_code'],
+      conflictStatusCode: 409
+    },
+    // Primary key: location_code (VARCHAR, manual assignment)
+    // Ultimate CRUD should auto-discover this
+    responseMessages: {
+      200: 'Inventory retrieved successfully',
+      201: 'Inventory location created successfully',
+      400: 'Invalid inventory data',
+      404: 'Inventory location not found',
+      409: 'Location code already exists'
+    }
   }
 ];
 

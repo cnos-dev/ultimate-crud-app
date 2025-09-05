@@ -9,12 +9,17 @@ const cors = require('cors');
 const { Sequelize } = require('sequelize');
 const UltimateCrud = require('ultimate-crud');
 const entities = require('./model/entities');
+const { validateUserData, validateCategoryData } = require('./middleware/validation');
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Add custom validation middleware BEFORE Ultimate CRUD initialization
+app.use('/api/users', validateUserData);
+app.use('/api/categories', validateCategoryData);
 
 // Database Configuration
 const dbConfig = {

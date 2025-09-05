@@ -358,6 +358,168 @@ app.use('/api/users', validateUserData);
 }
 ```
 
+## 🔑 Custom Primary Key Support
+
+**Ultimate CRUD fully supports custom primary key names and types** through automatic schema discovery. You can use any primary key naming convention without configuration changes.
+
+### **✅ Supported Primary Key Types**
+
+#### **1. Custom Integer Primary Keys**
+```sql
+CREATE TABLE products (
+    product_id INT PRIMARY KEY AUTO_INCREMENT,  -- Custom PK name
+    name VARCHAR(100) NOT NULL,
+    price DECIMAL(10,2) NOT NULL
+);
+```
+
+**API Results:**
+- ✅ `GET /api/products` - Returns all products with `product_id` field
+- ✅ `GET /api/products/123` - Gets product by `product_id` value
+- ✅ `POST /api/products` - Creates product (auto-generates `product_id`)
+
+#### **2. UUID Primary Keys**
+```sql
+CREATE TABLE orders (
+    order_uuid VARCHAR(36) PRIMARY KEY,  -- UUID as PK
+    customer_name VARCHAR(100) NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL
+);
+```
+
+**API Results:**
+- ✅ `GET /api/orders` - Returns all orders with `order_uuid` field
+- ✅ `GET /api/orders/550e8400-e29b-41d4-a716-446655440001` - Gets order by UUID
+- ✅ `POST /api/orders` - Creates order (requires UUID in request body)
+
+#### **3. String Primary Keys**
+```sql
+CREATE TABLE inventory (
+    location_code VARCHAR(10) PRIMARY KEY,  -- String PK
+    warehouse_name VARCHAR(100) NOT NULL,
+    capacity INT DEFAULT 0
+);
+```
+
+**API Results:**
+- ✅ `GET /api/inventory` - Returns all locations with `location_code` field
+- ✅ `GET /api/inventory/WH01` - Gets location by code
+- ✅ `POST /api/inventory` - Creates location (requires manual `location_code`)
+
+#### **4. Compound Primary Keys**
+```sql
+CREATE TABLE order_items (
+    order_uuid VARCHAR(36),
+    product_id INT,
+    quantity INT NOT NULL,
+    PRIMARY KEY (order_uuid, product_id)  -- Compound PK
+);
+```
+
+**API Results:**
+- ✅ `GET /api/order-items` - Returns all items with both PK fields
+- ✅ `POST /api/order-items` - Creates item (requires both PK values)
+
+### **🔧 Zero Configuration Required**
+
+```javascript
+// This is ALL you need - no PK field specification!
+{
+  name: 'products',
+  type: 'table',
+  route: '/api/products'
+  // Ultimate CRUD auto-detects product_id as primary key
+}
+```
+
+**Ultimate CRUD automatically:**
+- 🔍 **Detects** custom primary key names through schema discovery
+- 🚀 **Generates** proper REST routes using detected primary keys
+- 📊 **Preserves** custom field names in API responses
+- 🎯 **Handles** all CRUD operations with correct primary key values
+
+### **📊 API Response Examples**
+
+**Custom Primary Key Response:**
+```json
+{
+  "message": "Products retrieved successfully",
+  "data": [
+    {
+      "product_id": 1,        // ← Custom PK name preserved
+      "name": "Laptop",
+      "price": "1000.00",
+      "sku": "LAP001"
+    }
+  ]
+}
+```
+
+**UUID Primary Key Response:**
+```json
+{
+  "message": "Orders retrieved successfully",
+  "data": [
+    {
+      "order_uuid": "550e8400-e29b-41d4-a716-446655440001",  // ← UUID PK
+      "customer_name": "John Doe",
+      "total_amount": "1109.97",
+      "status": "completed"
+    }
+  ]
+}
+```
+
+### **🎯 Best Practices**
+
+**✅ Recommended:**
+- Use descriptive, domain-specific primary key names (`product_id`, `order_uuid`, `customer_number`)
+- Maintain consistent naming conventions across related tables
+- Consider UUIDs for distributed systems or when global uniqueness is required
+
+**⚠️ Considerations:**
+- **Manual Primary Keys**: Must provide values in POST requests (UUIDs, strings)
+- **Compound Primary Keys**: Individual record operations may need special handling
+- **Performance**: String/UUID primary keys have different performance characteristics than integers
+
+### **🧪 Testing Custom Primary Keys**
+
+```bash
+# Test auto-increment custom PK
+curl http://localhost:3000/api/products
+curl http://localhost:3000/api/products/1
+
+# Test UUID PK
+curl "http://localhost:3000/api/orders/550e8400-e29b-41d4-a716-446655440001"
+
+# Test string PK
+curl http://localhost:3000/api/inventory/WH01
+
+# Test creation with manual PK
+curl -X POST http://localhost:3000/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "order_uuid": "550e8400-e29b-41d4-a716-446655440999",
+    "customer_name": "Test Customer",
+    "total_amount": 99.99
+  }'
+```
+
+**Result:** Ultimate CRUD adapts to your database schema, not the other way around. Use meaningful primary key names that fit your business domain!
+
+### **📚 Complete Analysis Available**
+
+For comprehensive details including:
+- **Complete test results** with all scenarios tested
+- **Best practices** for database design with custom primary keys  
+- **Migration strategies** from standard `id` to custom primary keys
+- **Performance considerations** and limitations
+- **Real-world examples** from e-commerce and SaaS applications
+
+See:
+- **Detailed Implementation**: [`src/README.md`](src/README.md#-custom-primary-key-support-tested--verified-) 
+- **Complete Analysis**: [`articles/custom-primary-key-analysis.md`](articles/custom-primary-key-analysis.md)
+
 ### API Types
 - **REST API**: Traditional REST endpoints
 - **GraphQL**: Query and mutation operations

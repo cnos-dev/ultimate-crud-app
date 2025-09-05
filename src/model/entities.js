@@ -13,6 +13,10 @@ const entities = [
     name: 'users',
     type: 'table',
     route: '/api/users',
+    validation: {
+      uniqueFields: ['username', 'email'],
+      conflictStatusCode: 409
+    },
     // Schema will be auto-discovered from database
     // Custom associations can be defined if needed
     associations: [
@@ -42,6 +46,10 @@ const entities = [
     name: 'categories',
     type: 'table',
     route: '/api/categories',
+    validation: {
+      uniqueFields: ['name', 'slug'],
+      conflictStatusCode: 409
+    },
     // Schema auto-discovered from database
     associations: [
       {
@@ -54,7 +62,9 @@ const entities = [
     responseMessages: {
       200: 'Categories retrieved successfully',
       201: 'Category created successfully',
-      404: 'Category not found'
+      400: 'Invalid category data',
+      404: 'Category not found',
+      409: 'Category name or slug already exists'
     }
   },
 

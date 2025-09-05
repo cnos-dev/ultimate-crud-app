@@ -78,6 +78,12 @@ const initializeApp = async () => {
               description: 'Development server'
             }
           ]
+        },
+        
+        // Error handling configuration
+        errorHandling: {
+          uniqueConstraintCode: 409,
+          detailedErrors: true
         }
       }
     });

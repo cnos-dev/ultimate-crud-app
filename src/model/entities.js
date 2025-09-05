@@ -242,39 +242,9 @@ const entities = [
   
   {
     name: 'user_summary',
-    type: process.env.DB_DIALECT === 'sqlite' ? 'query' : 'procedure',
+    type: 'procedure',
     route: '/api/user-summary',
-    // For SQLite, we need to provide the SQL query
-    // For MySQL/PostgreSQL, it calls the existing procedure
-    ...(process.env.DB_DIALECT === 'sqlite' ? {
-      sql: `
-        SELECT 
-          u.id,
-          u.username,
-          u.email,
-          (COALESCE(u.firstName, '') || ' ' || COALESCE(u.lastName, '')) as fullName,
-          u.bio,
-          u.isActive,
-          COUNT(DISTINCT p.id) as totalPosts,
-          COUNT(DISTINCT CASE WHEN p.status = 'published' THEN p.id END) as publishedPosts,
-          COUNT(DISTINCT c.id) as totalComments,
-          COALESCE(SUM(p.views), 0) as totalViews,
-          COALESCE(SUM(p.likes), 0) as totalLikes,
-          u.createdAt as joinedAt,
-          JULIANDAY('now') - JULIANDAY(u.createdAt) as daysSinceJoined,
-          (COALESCE(SUM(p.views), 0) + COALESCE(SUM(p.likes), 0) * 2 + COUNT(DISTINCT c.id) * 3) as engagementScore,
-          CASE 
-            WHEN (COALESCE(SUM(p.views), 0) + COALESCE(SUM(p.likes), 0) * 2 + COUNT(DISTINCT c.id) * 3) > 100 THEN 'High'
-            WHEN (COALESCE(SUM(p.views), 0) + COALESCE(SUM(p.likes), 0) * 2 + COUNT(DISTINCT c.id) * 3) > 50 THEN 'Medium'
-            ELSE 'Low'
-          END as engagementLevel
-        FROM users u
-        LEFT JOIN posts p ON u.id = p.userId
-        LEFT JOIN comments c ON u.id = c.userId
-        WHERE u.id = ?
-        GROUP BY u.id, u.username, u.email, u.firstName, u.lastName, u.bio, u.isActive, u.createdAt
-      `
-    } : {}),
+    procedure: 'user_summary', // Explicit procedure name
     parameters: [
       {
         name: 'user_id',
@@ -292,36 +262,32 @@ const entities = [
 
   {
     name: 'popular_posts',
-    type: process.env.DB_DIALECT === 'sqlite' ? 'query' : 'procedure',
+    type: 'query',
     route: '/api/popular-posts',
-    // For SQLite, we need to provide the SQL query
-    // For MySQL/PostgreSQL, it calls the existing procedure
-    ...(process.env.DB_DIALECT === 'sqlite' ? {
-      sql: `
-        SELECT 
-          p.id,
-          p.title,
-          p.slug,
-          p.excerpt,
-          p.featuredImage,
-          p.publishedAt,
-          u.username as author,
-          c.name as category,
-          p.views,
-          p.likes,
-          COUNT(DISTINCT cm.id) as commentCount,
-          (p.views * 0.6 + p.likes * 0.3 + COUNT(DISTINCT cm.id) * 0.1) as popularity_score
-        FROM posts p
-        JOIN users u ON p.userId = u.id
-        JOIN categories c ON p.categoryId = c.id
-        LEFT JOIN comments cm ON p.id = cm.postId AND cm.isApproved = 1
-        WHERE p.status = 'published' 
-        AND p.publishedAt >= datetime('now', '-' || ? || ' days')
-        GROUP BY p.id, p.title, p.slug, p.excerpt, p.featuredImage, p.publishedAt, u.username, c.name, p.views, p.likes
-        ORDER BY popularity_score DESC
-        LIMIT ?
-      `
-    } : {}),
+    sql: `
+      SELECT 
+        p.id,
+        p.title,
+        p.slug,
+        p.excerpt,
+        p.featuredImage,
+        p.publishedAt,
+        u.username as author,
+        c.name as category,
+        p.views,
+        p.likes,
+        COUNT(DISTINCT cm.id) as commentCount,
+        (p.views * 0.6 + p.likes * 0.3 + COUNT(DISTINCT cm.id) * 0.1) as popularity_score
+      FROM posts p
+      JOIN users u ON p.userId = u.id
+      JOIN categories c ON p.categoryId = c.id
+      LEFT JOIN comments cm ON p.id = cm.postId AND cm.isApproved = true
+      WHERE p.status = 'published' 
+      AND p.publishedAt >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+      GROUP BY p.id, p.title, p.slug, p.excerpt, p.featuredImage, p.publishedAt, u.username, c.name, p.views, p.likes
+      ORDER BY popularity_score DESC
+      LIMIT 10
+    `,
     parameters: [
       {
         name: 'days_back',

@@ -149,6 +149,48 @@ npm run test:postgresql
 npm run test:sqlite
 ```
 
+## ⚠️ Known Issues
+
+### GraphQL Schema Limitations (Ultimate CRUD v1.0.0-alpha.1)
+
+The current version of Ultimate CRUD has some limitations in GraphQL schema generation:
+
+**Working in GraphQL:**
+- ✅ Table entities (CRUD operations): `usersList`, `users`, `postsList`, `posts`, etc.
+- ✅ Basic queries and mutations for database tables
+- ✅ Associations and relationships between tables
+
+**Not Currently Exposed in GraphQL:**
+- ❌ Stored procedures (e.g., `user_summary`) 
+- ❌ Custom SQL queries (e.g., `popular_posts`, `recent_posts`)
+- ❌ Database views (e.g., `post_stats`, `user_analytics`)
+- ❌ Complex parameterized queries
+
+**Workaround:**
+All functionality works perfectly through REST API endpoints:
+- `POST /api/user-summary` - Stored procedure calls
+- `GET /api/popular-posts` - Custom queries  
+- `GET /api/post-stats` - Database views
+
+**Status:**
+These limitations are being addressed in future versions of Ultimate CRUD. The GraphQL schema generation will be enhanced to support all entity types including procedures, views, and custom queries.
+
+### Stored Procedure Configuration
+
+When defining stored procedures in entities, you must include an explicit `procedure` property:
+
+```javascript
+{
+  name: 'user_summary',
+  type: 'procedure',
+  route: '/api/user-summary',
+  procedure: 'user_summary', // Required: explicit procedure name
+  parameters: [...]
+}
+```
+
+Without the explicit `procedure` property, the system may attempt to call an undefined procedure.
+
 ## 🤝 Contributing
 
 1. Fork the repository

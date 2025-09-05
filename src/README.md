@@ -595,6 +595,91 @@ npm start
 - Verify port 5432 connectivity
 - Check pgAdmin access at http://localhost:8082
 
+## ⚠️ Known Issues
+
+### GraphQL Schema Limitations (Ultimate CRUD v1.0.0-alpha.1)
+
+The current version of Ultimate CRUD has some limitations in GraphQL schema generation:
+
+**✅ Working in GraphQL:**
+- Table entities (CRUD operations): `usersList`, `users`, `postsList`, `posts`, etc.
+- Basic queries and mutations for database tables
+- Associations and relationships between tables
+- Schema introspection and playground functionality
+
+**❌ Not Currently Exposed in GraphQL:**
+- Stored procedures (e.g., `user_summary`)
+- Custom SQL queries (e.g., `popular_posts`, `recent_posts`, `search_posts`)
+- Database views (e.g., `post_stats`, `user_analytics`, `category_summary`)
+- Complex parameterized queries
+
+**🔧 Workaround - Use REST API:**
+All functionality works perfectly through REST API endpoints:
+
+```bash
+# Stored procedures
+curl -X POST http://localhost:3000/api/user-summary \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": 1}'
+
+# Custom queries  
+curl http://localhost:3000/api/popular-posts
+curl http://localhost:3000/api/recent-posts
+curl "http://localhost:3000/api/search-posts?search_term=javascript"
+
+# Database views
+curl http://localhost:3000/api/post-stats
+curl http://localhost:3000/api/user-analytics
+curl http://localhost:3000/api/category-summary
+```
+
+**📊 GraphQL Testing:**
+You can verify which queries are available by checking the schema:
+
+```bash
+curl -X POST http://localhost:3000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ __schema { queryType { fields { name description } } } }"}'
+```
+
+Current available GraphQL queries:
+- `usersList`, `users` - User data
+- `postsList`, `posts` - Post data  
+- `categoriesList`, `categories` - Category data
+- `commentsList`, `comments` - Comment data
+
+**🔮 Future Development:**
+These limitations are being addressed in future versions of Ultimate CRUD. The GraphQL schema generation will be enhanced to support all entity types including procedures, views, and custom queries.
+
+### Stored Procedure Configuration
+
+**⚠️ Important:** When defining stored procedures in entities, you must include an explicit `procedure` property:
+
+```javascript
+{
+  name: 'user_summary',
+  type: 'procedure',
+  route: '/api/user-summary',
+  procedure: 'user_summary', // ✅ Required: explicit procedure name
+  parameters: [
+    {
+      name: 'user_id',
+      type: 'INTEGER',
+      required: true,
+      description: 'User ID to get summary for'
+    }
+  ]
+}
+```
+
+**❌ Without the explicit `procedure` property:**
+- The system attempts to call an undefined procedure
+- Results in error: `PROCEDURE ultimate_crud_blog.undefined does not exist`
+
+**✅ With the explicit `procedure` property:**
+- System correctly calls the named stored procedure
+- REST API endpoint works as expected
+
 ## 🚀 Production Considerations
 
 ### 1. Security

@@ -10,12 +10,31 @@ const { Sequelize } = require('sequelize');
 const UltimateCrud = require('ultimate-crud');
 const entities = require('./model/entities');
 const { validateUserData, validateCategoryData } = require('./middleware/validation');
+const authRoutes = require('./routes/auth');
+const passwordResetRoutes = require('./routes/password-reset');
+const { requireAuthForAPI, applyRateLimit } = require('./middleware/security');
 
 const app = express();
+
+// Store sequelize instance globally for middleware access
+let sequelizeInstance;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Trust proxy for rate limiting (if behind reverse proxy)
+app.set('trust proxy', 1);
+
+// Add authentication routes BEFORE security middleware
+app.use('/auth', authRoutes);
+app.use('/auth', passwordResetRoutes);
+
+// Apply rate limiting to all routes
+app.use(applyRateLimit());
+
+// Require authentication for all API endpoints
+app.use(requireAuthForAPI());
 
 // Add custom validation middleware BEFORE Ultimate CRUD initialization
 app.use('/api/users', validateUserData);
@@ -44,6 +63,10 @@ if (dbConfig.dialect === 'sqlite') {
 }
 
 const sequelize = new Sequelize(dbConfig);
+sequelizeInstance = sequelize;
+
+// Make sequelize available to middleware
+app.locals.sequelize = sequelize;
 
 // Initialize Ultimate CRUD
 const initializeApp = async () => {

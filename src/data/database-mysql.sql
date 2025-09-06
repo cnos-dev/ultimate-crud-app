@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('user', 'admin') DEFAULT 'user',
     firstName VARCHAR(50),
     lastName VARCHAR(50),
     bio TEXT,
@@ -20,7 +22,8 @@ CREATE TABLE IF NOT EXISTS users (
     
     INDEX idx_username (username),
     INDEX idx_email (email),
-    INDEX idx_active (isActive)
+    INDEX idx_active (isActive),
+    INDEX idx_role (role)
 );
 
 -- Categories table

@@ -17,6 +17,8 @@
     "setup:mysql": "./setup-db.sh mysql",
     "setup:postgres": "./setup-db.sh postgres",
     "setup:both": "./setup-db.sh both",
+    "setup:admin": "node scripts/setup-admin.js",
+    "setup:full": "npm run setup && npm run setup:admin",
     "db:stop": "./setup-db.sh stop",
     "db:reset": "./setup-db.sh reset",
     "db:status": "./setup-db.sh status",
@@ -24,9 +26,12 @@
     "test": "echo \"Run setup first, then npm start\""
   },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-rate-limit": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.6.0",
     "pg": "^8.11.0",
     "pg-hstore": "^2.3.4",

@@ -498,6 +498,47 @@ curl -X POST http://localhost:3000/graphql \
 
 **Bottom Line**: Ultimate CRUD's schema discovery means you can design your database with meaningful primary key names that fit your business domain, and the API will automatically adapt. No compromises needed!
 
+## 🔐 **JWT Authentication System**
+
+This implementation includes a **production-ready JWT authentication system** with comprehensive security features:
+
+### **🔑 Authentication Features**
+- ✅ **JWT Tokens**: Access tokens (24h) and refresh tokens (7d)
+- ✅ **Password Security**: bcrypt hashing with configurable salt rounds
+- ✅ **Role-Based Access**: User and admin roles with granular permissions
+- ✅ **Rate Limiting**: Protection against brute force attacks
+- ✅ **Entity Security**: Configurable protection per entity (public/authenticated/admin)
+
+### **🚀 Quick Authentication Setup**
+```bash
+# 1. Setup database with authentication fields
+npm run setup:full
+
+# 2. Start server
+npm start
+
+# 3. Login with default admin
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+```
+
+### **🛡️ Security Configuration**
+The system provides flexible entity-level security:
+
+```javascript
+// Public access - no authentication required
+categories: { read: 'public', write: 'authenticated' }
+
+// Authenticated access - login required
+posts: { read: 'public', write: 'authenticated' }
+
+// Admin access - admin role required
+users: { read: 'admin', write: 'admin', own: true }
+```
+
+**📖 Full Documentation**: See `docs/authentication.md` for complete authentication guide.
+
 ## ⚠️ Known Issues
 
 ### GraphQL Schema Limitations (Ultimate CRUD v1.0.0-alpha.2)Database Views**: Read-only endpoints for complex aggregated data

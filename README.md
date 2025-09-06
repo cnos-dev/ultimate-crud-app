@@ -1,34 +1,33 @@
-# Ultimate CRUD App
+# Ultimate CRUD App with JWT Authentication
 
-A comprehensive demonstration application showcasing the **ultimate-crud** npm package functionality with a complete, production-ready implementation featuring advanced validation, error handling, and multi-database support.
+A **production-ready** demonstration of the **ultimate-crud** npm package featuring comprehensive **JWT authentication, authorization, and security**. This implementation showcases enterprise-level features including multi-database support, validation systems, and custom primary key handling.
 
-## 🎯 Project Status & Achievements
+## 🔐 **Authentication-Focused Implementation**
 
-### ✅ **Complete Implementation Status**
-This project demonstrates a **fully functional, production-ready** Ultimate CRUD application with:
+This project has been **streamlined to focus on the `src/` implementation** with complete JWT authentication system. All authentication-related changes are contained within the `src/` folder for clarity and maintainability.
 
-**🏗️ **Core Architecture**:**
-- ✅ **Complete restructuring**: Renamed `Simple/` to `src/` as main implementation
-- ✅ **Multi-database support**: MySQL, PostgreSQL, SQLite with Docker automation
-- ✅ **Comprehensive validation**: Three-layer validation system (database + entity + middleware)
-- ✅ **Advanced error handling**: Proper HTTP status codes with field-specific error details
-- ✅ **Production-ready features**: Authentication, rate limiting, comprehensive testing
+### ✅ **What's Fully Working**
 
-**🛡️ **Validation & Error Handling** (Fully Implemented):**
-- ✅ **Database constraints**: UNIQUE constraints with proper conflict handling
-- ✅ **Entity validation**: Configured `uniqueFields` and `conflictStatusCode` for proper API responses
-- ✅ **Custom middleware**: Business logic validation (Gmail blocking, format validation, custom rules)
-- ✅ **Error responses**: `409 Conflict` for duplicates, `400 Bad Request` for business rules
-- ✅ **Multiple errors**: Support for multiple validation failures in single response
+**🏗️ **Core Ultimate CRUD Features**:**
+- ✅ **Auto Schema Discovery**: Reads database schema and generates models automatically  
+- ✅ **Multi-Database Support**: MySQL, PostgreSQL, SQLite with zero configuration
+- ✅ **REST API Generation**: Complete CRUD endpoints for tables, views, procedures
+- ✅ **GraphQL Support**: Full API for table operations with schema introspection
+- ✅ **Custom Primary Keys**: Comprehensive support for any primary key naming convention
 
-**🔧 **Package Updates & Fixes**:**
-- ✅ **Ultimate CRUD v1.0.0-alpha.2**: Updated from v1.0.0-alpha.1 with validation fixes
-- ✅ **Stored procedures**: Fixed GraphQL integration with explicit `procedure` property
-- ✅ **Unique constraints**: Resolved validation issues with proper HTTP status codes
+**🔐 **JWT Authentication System (NEW)**:**
+- ✅ **JWT Tokens**: Access tokens (24h) and refresh tokens (7d) with secure signing
+- ✅ **User Registration/Login**: Complete authentication flow with password hashing
+- ✅ **Role-Based Access Control**: User and admin roles with granular permissions
+- ✅ **Entity-Level Security**: Configurable protection per entity (public/authenticated/admin)
+- ✅ **Rate Limiting**: Protection against brute force attacks and API abuse
+- ✅ **Security Middleware**: Comprehensive authentication and authorization layers
 
-**🧪 **Testing & Verification**:**
-- ✅ **REST API**: Fully functional with all CRUD operations, procedures, views
-- ✅ **GraphQL**: Working for tables, with documented limitations for procedures/views
+**🛡️ **Production Security Features**:**
+- ✅ **Password Security**: bcrypt hashing with configurable salt rounds
+- ✅ **Token Security**: HMAC SHA256 signatures with issuer/audience validation
+- ✅ **Error Handling**: Secure error messages with proper HTTP status codes
+- ✅ **CORS Protection**: Cross-origin request handling and security headers
 - ✅ **Validation testing**: Comprehensive test cases for all validation layers
 - ✅ **Database operations**: Verified MySQL stored procedures and data integrity
 
@@ -52,6 +51,55 @@ npm start
 ```
 
 Visit http://localhost:3000 to explore the API with comprehensive validation!
+
+## 🚀 **Quick Start Guide**
+
+### **📁 Project Structure (Focused Implementation)**
+```
+ultimate-crud-app/
+├── src/                          # 🎯 Main implementation with JWT auth
+│   ├── middleware/               # Authentication & security middleware
+│   │   ├── auth.js              # JWT authentication middleware
+│   │   ├── security.js          # Entity-level security configuration
+│   │   └── validation.js        # Business logic validation
+│   ├── routes/                   # Authentication routes
+│   │   └── auth.js              # Login, register, refresh, profile
+│   ├── docs/                     # Documentation
+│   │   └── authentication.md    # Complete auth guide
+│   ├── data/                     # Database schemas & migrations
+│   └── model/                    # Entity definitions
+├── articles/                     # Technical articles & analysis
+└── _backup/                      # 📦 Moved unused folders here
+    └── unused-folders/           # (Advanced, Simple, mysql, etc.)
+```
+
+### **⚡ One-Command Setup**
+```bash
+# Navigate to main implementation
+cd src/
+
+# Setup database and create admin user
+npm run setup:full
+
+# Start the server with authentication
+npm start
+```
+
+### **🔐 Test Authentication (30 seconds)**
+```bash
+# 1. Login with admin user
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "password"}'
+
+# 2. Copy the access_token from response
+
+# 3. Access protected endpoint
+curl -X GET http://localhost:3000/api/users \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**🎉 You now have a production-ready CRUD API with JWT authentication!**
 
 ## 📋 **Implementation Summary**
 
